@@ -1,0 +1,15 @@
+-- AlterTable
+ALTER TABLE "Booking" ADD COLUMN     "attendeeEmail" TEXT,
+ADD COLUMN     "attendeeLanguage" TEXT,
+ADD COLUMN     "attendeeName" TEXT,
+ADD COLUMN     "attendeePhone" TEXT,
+ADD COLUMN     "attendeeTimeZone" TEXT,
+ADD COLUMN     "bookingFieldsResponses" JSONB,
+ADD COLUMN     "emailVerificationCode" TEXT,
+ADD COLUMN     "guests" TEXT[],
+ADD COLUMN     "lengthInMinutes" INTEGER,
+ADD COLUMN     "location" JSONB,
+ADD COLUMN     "meetingUrl" TEXT,
+ADD COLUMN     "metadata" JSONB,
+ADD COLUMN     "organizationSlug" TEXT,
+ADD COLUMN     "routing" JSONB;
