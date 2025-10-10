@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Logger } from '@nestjs/common';
 import { AudioService } from './audio.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Audio')
 @Controller('audio')
@@ -53,6 +53,64 @@ export class AudioController {
       message: 'Audio queue statistics',
       ...stats,
       timestamp: new Date().toISOString(),
+    };
+  }
+
+  @Post('math')
+  @ApiOperation({
+    summary: 'Perform a math operation (add, subtract, multiply, divide)',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        num1: { type: 'number', example: 10 },
+        num2: { type: 'number', example: 5 },
+        operation: {
+          type: 'string',
+          example: 'add',
+          enum: ['add', 'subtract', 'multiply', 'divide'],
+        },
+      },
+      required: ['num1', 'num2', 'operation'],
+    },
+  })
+  async processMath(
+    @Body() body: { num1: number; num2: number; operation: string },
+  ) {
+    const { num1, num2, operation } = body;
+
+    const jobResult = await this.audioService.addMathJob(num1, num2, operation);
+
+    return {
+      message: `Math job '${operation}' completed`,
+      ...jobResult,
+    };
+  }
+
+  @Post('math/parent')
+  @ApiOperation({ summary: 'Demonstrate BullMQ parent-child job flow' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        a: { type: 'number', example: 2 },
+        b: { type: 'number', example: 3 },
+        c: { type: 'number', example: 4 },
+      },
+      required: ['a', 'b', 'c'],
+    },
+  })
+  async createParentChildJobs(
+    @Body() body: { a: number; b: number; c: number },
+  ) {
+    const { a, b, c } = body;
+
+    const result = await this.audioService.createParentChildJobs(a, b, c);
+
+    return {
+      message: 'Parent-child jobs created',
+      ...result,
     };
   }
 }
