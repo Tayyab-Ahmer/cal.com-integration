@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AiService } from './ai.service';
+import { chatDto, promtDto } from './dto/ai.dto';
 
 @ApiTags('AI')
 @Controller('ai')
@@ -17,7 +18,7 @@ export class AiController {
       },
     },
   })
-  async generateCustom(@Body() bd: { prompt: string }) {
+  async generateCustom(@Body() bd: promtDto) {
     const content = await this.aiService.generateContentFromCustomPrompt(
       bd.prompt,
     );
@@ -41,39 +42,29 @@ export class AiController {
       },
     },
   })
-  async generateSystemCustom(@Body() bd: { prompt: string }) {
+  async generateSystemCustom(@Body() bd: promtDto) {
     const content = await this.aiService.generateContentFromSystemCustomPrompt(
       bd.prompt,
     );
     return { content };
   }
 
-  @Post('message-array-text-only')
+  @Post('chat')
   @ApiOperation({
-    summary: 'Generate content using structured message array (Text only)',
+    summary: 'Chat with assistant using full conversation memory',
   })
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        systemPrompt: {
-          type: 'string',
-          example: 'You are an expert tech writer who explains things simply.',
-        },
-        userPrompt: {
-          type: 'string',
-          example: 'Explain how NestJS works in one paragraph.',
-        },
+        userId: { type: 'string', example: 'user-1' },
+        message: { type: 'string', example: 'what is nextjs?' },
       },
     },
   })
-  async generateFromMessageArray(
-    @Body() bd: { systemPrompt: string; userPrompt: string },
-  ) {
-    const content = await this.aiService.generateContentFromMessageArray(
-      bd.systemPrompt,
-      bd.userPrompt,
-    );
+  async chatWithAssistant(@Body() body: chatDto) {
+    const { userId, message } = body;
+    const content = await this.aiService.chatWithAssistant(userId, message);
     return { content };
   }
 
@@ -90,7 +81,7 @@ export class AiController {
       },
     },
   })
-  async askWithTool(@Body() body: { prompt: string }) {
+  async askWithTool(@Body() body: promtDto) {
     const response = await this.aiService.askWithTools(body.prompt);
     return { response };
   }
